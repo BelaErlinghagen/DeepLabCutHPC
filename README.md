@@ -2,9 +2,9 @@
 
 This repository contains information on how to set up an analysis pipeline with DeepLabCut on Marvin.
 
-# Set up instructions
+# Setup instructions
 
-## STEP 1:
+## STEP 1: Getting access to Marvin GPU nodes
 Adjust the SSH credential file to use the following address:
 gpu.marvin.hpc.uni-bonn.de
 
@@ -12,7 +12,7 @@ This will allow you to log in to node login03 on Marvin, where you can use GPU a
 
 When you now ssh into Marvin, you will see you are registered as username@login03
 
-## STEP 2:
+## STEP 2: Initialize Anaconda in your Marvin home directory
 Once logged into Marvin, perform the following three commands:
 
 module load Miniforge3 (-> this is a free Anaconda clone)
@@ -23,7 +23,7 @@ source ~/.bashrc (to tell the current bash terminal it should update to use Anac
 
 You should now see the typical (base) appear on the left of the current terminal line.
 
-## STEP 3:
+## STEP 3: Install Deeplabcut in a virtual environment in your Marvin home directory
 The next step is to copy the DEEPLABCUT.yaml from your machine to Marvin in order to create a DeepLabCut python environment.
 1) Download the yaml from: https://github.com/DeepLabCut/DeepLabCut/blob/main/conda-environments/DEEPLABCUT.yaml
 2) Perform a small edit to DEEPLABCUT.yaml: under Dependencies->deeplabcut, you can see that in the brackets, "gui" is listed. 
@@ -46,10 +46,36 @@ python -c "import torch; print(torch.cuda.is_available())"
 This should return "False", because you are checking whether CUDA (i.e. access to GPUs) is available on the login node of the cluster, which is not the case. 
 Running the same command in a workspace (after "module load CUDA" would return "True").
 
-## STEP 4:
+You can also check if the installation of DeepLabCut worked (also after activating the environment of course) with:
+
+python -c "import deeplabcut; print(deeplabcut.__version__)"
+
+## STEP 4: Create a workspace on the cluster to store your project data in
 Still on the cluster, create a workspace to put the video data that you want to analyse:
 
 ws_allocate NAME DURATION (for example: ws_allocate DLCAnalysis 90 -> 90 means the workspace will be available for 90 days, then it will be automatically deleted. Don't worry, workspace durations can be extended and you can also just create new ones -> https://wiki.hpc.uni-bonn.de/en/marvin/workspaces)
+
+## STEP 5: Create the project folder, labels and training dataset on your local device
+Install DeepLabCut on your device and launch the GUI.
+
+Create a DeepLabCut project folder on your local device.
+
+! Make sure to copy all the videos that you want to work with into the project folder (i.e. select the tick box when creating the project) !
+
+Now, it is time to:
+- Extract frames
+- Label the frames
+- Create the training dataset
+
+For these steps, you can simply use the Deeplabcut GUI.
+
+## STEP 6: Copy the project folder to Marvin
+Copy the entire project folder into the workspace using the command:
+
+scp -r /path/to/local/folder [Username]@gpu.marvin.hpc.uni-bonn.de:/path/to/workspace(which you can find by running ws_list when ssh'd to Marvin)
+
+## STEP 7: Train your DLC model!
+Run SLURM job 
 
 
 
