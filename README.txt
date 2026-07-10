@@ -1,0 +1,42 @@
+STEP 1:
+Adjust the SSH credential file to use the following address:
+gpu.marvin.hpc.uni-bonn.de
+
+This will allow you to log in to node login03 on Marvin, where you can use GPU acceleration for DLC.
+
+When you now ssh into Marvin, you will see you are registered as username@login03
+
+STEP 2:
+Once logged into Marvin, perform the following three commands:
+module load Miniforge3 (-> this is a free Anaconda clone)
+conda init (to initialize Anaconda)
+source ~/.bashrc (to tell the current bash terminal it should update to use Anaconda)
+
+You should now see the typical (base) appear on the left of the current terminal line.
+
+STEP 3:
+The next step is to copy the DEEPLABCUT.yaml from your machine to Marvin in order to create a DeepLabCut python environment.
+1) Download the yaml from: https://github.com/DeepLabCut/DeepLabCut/blob/main/conda-environments/DEEPLABCUT.yaml
+2) Perform a small edit to DEEPLABCUT.yaml: under Dependencies->deeplabcut, you can see that in the brackets, "gui" is listed. 
+Remove this here, because you do not need it on the cluster. 
+This step is NOT optional, because otherwise there are dependency errors when installing DLC on the cluster.
+After editing, the deeplabcut entry should look like this: deeplabcut[modelzoo,wandb].
+3) Open a new terminal and copy the yaml from your computer (here as an example from the Downloads folder) to your Marvin home directory via: 
+scp Downloads/DEEPLABCUT.yaml [USERNAME]@gpu.marvin.hpc.uni-bonn.de:/home/[USERNAME]
+-> Replace [USERNAME] with the id you see when you log in to Marvin (the one next to @login03)
+
+Now, ssh back into Marvin, check if the yaml file is in your home directory (ls -all) and then create the environment via:
+conda env create -f DEEPLABCUT.yaml
+
+If there are no errors, you can now also check if the installation of the modules worked by activating DEEPLABCUT (conda activate DEEPLABCUT) and running:
+python -c "import torch; print(torch.cuda.is_available())"
+This should return "False", because you are checking whether CUDA (i.e. access to GPUs) is available on the login node of the cluster, which is not the case. 
+Running the same command in a workspace (after "module load CUDA" would return "True").
+
+STEP 4:
+Still on the cluster, create a workspace to put the video data that you want to analyse:
+
+ws_allocate NAME DURATION (for example: ws_allocate DLCAnalysis 90 -> 90 means the workspace will be available for 90 days, then it will be automatically deleted. Don't worry, workspace durations can be extended and you can also just create new ones -> https://wiki.hpc.uni-bonn.de/en/marvin/workspaces)
+
+
+
