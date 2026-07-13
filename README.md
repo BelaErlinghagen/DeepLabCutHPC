@@ -25,18 +25,18 @@ You should now see the typical (base) appear on the left of the current terminal
 
 ## STEP 3: Install Deeplabcut in a virtual environment in your Marvin home directory
 The next step is to copy the DEEPLABCUT.yaml from your machine to Marvin in order to create a DeepLabCut python environment.
-1) Download the yaml from: https://github.com/DeepLabCut/DeepLabCut/blob/main/conda-environments/DEEPLABCUT.yaml
-2) Perform a small edit to DEEPLABCUT.yaml: under Dependencies->deeplabcut, you can see that in the brackets, "gui" is listed. 
-Remove this here, because you do not need it on the cluster. 
-This step is NOT optional, because otherwise there are dependency errors when installing DLC on the cluster.
-After editing, the deeplabcut entry should look like this: deeplabcut[modelzoo,wandb].
-3) Open a new terminal and copy the yaml from your computer (here as an example from the Downloads folder) to your Marvin home directory via:
+1) Download the yaml from this github repo.
+2) Open a new terminal and copy the yaml from your computer (here as an example from the Downloads folder) to your Marvin home directory via:
 
 scp Downloads/DEEPLABCUT.yaml [USERNAME]@gpu.marvin.hpc.uni-bonn.de:/home/[USERNAME]
 
 -> Replace [USERNAME] with the id you see when you log in to Marvin (the one next to @login03)
 
-Now, ssh back into Marvin, check if the yaml file is in your home directory (ls -all) and then create the environment via:
+During this step, you can also already copy the files dlc_analysis.py and run_dlc_array.sh to the Marvin home directory using the same command.
+
+scp /path/to/file [USERNAME]@gpu.marvin.hpc.uni-bonn.de:/home/[USERNAME]
+
+Now, ssh back into Marvin, check if the yaml file (and the other files) is in your home directory (ls -all) and then create the environment via:
 conda env create -f DEEPLABCUT.yaml
 
 If there are no errors, you can now also check if the installation of the modules worked by activating DEEPLABCUT (conda activate DEEPLABCUT) and running:
@@ -75,7 +75,26 @@ Copy the entire project folder into the workspace using the command:
 scp -r /path/to/local/folder [Username]@gpu.marvin.hpc.uni-bonn.de:/path/to/workspace(which you can find by running ws_list when ssh'd to Marvin)
 
 ## STEP 7: Train your DLC model!
-Run SLURM job 
+
+To perform training, you need to tell the script where it should look for A) the project folder and B) the python file to execute.
+Check the paths for both of these and copy them into the dlc_analysis.py file using:
+
+nano dlc_analysis.py
+
+Now, in order to train the DLC model, you need to run a SLURM job. The file "run_dlc_array.sh" is meant to be used twice. Once for the training, and later for the analysis. 
+For the training, navigate to the home directory on Marvin and run:
+
+sbatch run_dlc_array.sh
+
+You should get the message that your SLURM job was submitted.
+
+You can now check the output and error status of the job by running:
+
+tail jobid.out/jobid.err
+
+You can also check the status of the job on the cluster by running:
+
+squeue --me
 
 
 
