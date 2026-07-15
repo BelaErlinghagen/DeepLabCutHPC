@@ -41,7 +41,7 @@ During this step, you can also already copy the files dlc_analysis.py and run_dl
 
 ```scp /path/to/file [USERNAME]@gpu.marvin.hpc.uni-bonn.de:/home/[USERNAME]```
 
-Now, ssh back into Marvin, check if the yaml file and the other files are in your home directory (```ls -all``) and then create the environment via:
+Now, ssh back into Marvin, check if the yaml file and the other files are in your home directory (```ls -all```) and then create the environment via:
 
 ```conda env create -f DEEPLABCUT.yaml```
 
