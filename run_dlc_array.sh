@@ -34,13 +34,13 @@ set -euo pipefail
 
 # ===== User configuration ==================================================
 # Absolute path to the DeepLabCut project's config.yaml (inside your workspace).
-CONFIG="/lustre/scratch/data/s14berli_hpc-DLCAnalysis/IsbrandtDataAnalysis-Bela-2026-07-10/config.yaml"
+CONFIG="ENTER HERE"
 # Folder holding the videos to analyse (defaults to the project's videos/ dir).
 VIDEO_DIR="$(dirname "$CONFIG")/videos"
 # Video file extension to match.
 VIDEO_EXT="mp4"
 # Absolute path to the pipeline script (this repo).
-PIPELINE="/home/s14berli_hpc/dlc_analysis.py"
+PIPELINE="ENTER HERE"
 # Conda environment holding DeepLabCut.
 CONDA_ENV="DEEPLABCUT"
 # ===========================================================================
