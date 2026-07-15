@@ -28,7 +28,7 @@ Once logged into Marvin, perform the following three commands:
 
 You should now see the typical conda (base) appear on the left of the current terminal line.
 
-## STEP 3: Install Deeplabcut in a virtual environment in your Marvin home directory
+## STEP 3: Install DeepLabCut in a virtual environment in your Marvin home directory
 The next step is to copy the DEEPLABCUT.yaml from your machine to Marvin in order to create a DeepLabCut python environment.
 1) Download the yaml from this github repo.
 2) Open a new terminal and copy the yaml from your computer (here as an example from the Downloads folder) to your Marvin home directory via:
@@ -41,27 +41,28 @@ During this step, you can also already copy the files dlc_analysis.py and run_dl
 
 ```scp /path/to/file [USERNAME]@gpu.marvin.hpc.uni-bonn.de:/home/[USERNAME]```
 
-Now, ssh back into Marvin, check if the yaml file and the other files are in your home directory (ls -all) and then create the environment via:
+Now, ssh back into Marvin, check if the yaml file and the other files are in your home directory (```ls -all``) and then create the environment via:
 
 ```conda env create -f DEEPLABCUT.yaml```
 
-If there are no errors, you can now also check if the installation of the modules worked by activating DEEPLABCUT (conda activate DEEPLABCUT) and running:
+If there are no errors, you can now also check if the installation of the modules worked by activating DEEPLABCUT (```conda activate DEEPLABCUT```) and running:
 
 ```python -c "import torch; print(torch.cuda.is_available())"```
 
 This should return "False", because you are checking whether CUDA (i.e. access to GPUs) is available on the login node of the cluster, which is not the case. 
-Running the same command in a workspace (after "module load CUDA" would return "True").
+Running the same command in a workspace (after "module load CUDA", as is done in run_dlc_array.sh, would return "True").
 
 You can also check if the installation of DeepLabCut worked (also after activating the environment of course) with:
 
 ```python -c "import deeplabcut; print(deeplabcut.__version__)"```
 
 ## STEP 4: Create a workspace on the cluster to store your project data in
+
 Still on the cluster, create a workspace to put the video data that you want to analyse:
 
 ```ws_allocate NAME DURATION```
 
-(for example: ws_allocate DLCAnalysis 90 -> 90 means the workspace will be available for 90 days, then it will be automatically deleted. Don't worry, workspace durations can be extended and you can also just create new ones -> https://wiki.hpc.uni-bonn.de/en/marvin/workspaces)
+(for example: ```ws_allocate DLCAnalysis 90``` -> 90 means the workspace will be available for 90 days, then it will be automatically deleted. Don't worry, workspace durations can be extended and you can also just create new ones -> https://wiki.hpc.uni-bonn.de/en/marvin/workspaces)
 
 ## STEP 5: Create the project folder, labels and training dataset on your local device
 
@@ -100,14 +101,14 @@ You can adjust the paths by running (in the home directory):
 
 ## STEP 8: Train your DLC model!
 
-Now, in order to train the DLC model, you need to run a SLURM job. The file "run_dlc_array.sh" is meant to be used twice. Once for the training, and later for the analysis. 
+Now, in order to train the DLC model, you need to run a SLURM job. The file "run_dlc_array.sh" is meant to be used twice for this. Once for the training, and later for the analysis. 
 For the training, navigate to the home directory on Marvin and run:
 
 ```sbatch run_dlc_array.sh```
 
-You should get the message that your SLURM job was submitted.
+You should get the message that your SLURM job was submitted. 
 
-You can now check the output (i.e. what python prints, like "Training complete!") and error (i.e. error message) status of the job by running:
+Once the slurm job is running, two files for each slurm job are generated: jobid.out and jobid.err. You can now check the output jobid.out (i.e. what python prints, like "Training complete!") and error jobid.err (i.e. error message) status of the job by running:
 
 ```tail jobid.out/jobid.err```
 
@@ -117,17 +118,17 @@ You can also check the status of the job on the cluster by running:
 
 ### STEP 9: Use the trained model to analyze the videos
 
-Once the model has been trained, you can start analyzing the videos in the workspace. To start analyzing the videos, navigate to the workspace (ws_list -> copy the path of the workspace; cd path/to/workspace) and run:
+Once the model has been trained, you can start analyzing the videos in the workspace. To start analyzing the videos, navigate to the workspace (```ws_list``` -> copy the path of the workspace; ```cd path/to/workspace```) and run:
 
 ```N=$(find "<VIDEO_DIR>" -maxdepth 1 -type f -name '*.mp4' | wc -l)```
 
 Attention: This assumes you are using .mp4 files, if that is not the case specify a different format.
 
-Now, navigate back to the home directory (cd ~) and run:
+Now, navigate back to the home directory (```cd ~```) and run:
 
 ```sbatch --array=0-$((N-1)) run_dlc_array.sh```
 
-Again, you should get the message that the SLURM job was submitted. As in Step 8, you can check the status of the jobs (multiple jobs because they are running in parallel) by looking at the .err/.out files or squeue --me.
+Again, you should get the message that the SLURM job was submitted. As in Step 8, you can check the status of the jobs (multiple jobs because they are running in parallel) by looking at the .err/.out files or ```squeue --me```.
 
 ### STEP 10: Copy the results to your local device for evaluation
 
@@ -135,9 +136,19 @@ Done! If nothing went wrong up until this point, the analysis is now complete an
 
 ```scp -r [Username]@gpu.marvin.hpc.uni-bonn.de:[/path/to/workspace]/Results /path/to/copy/to```
 
-This command will copy the entire Results folder that was generated in the workspace to a location that is defined in the second argument.
+This command will copy the entire Results folder (-r means recursive, so all subfolders and files are copied as well) that was generated in the workspace to a location that is defined in the second argument.
 
 ### STEP 11: Repeat Steps 4-10
 
 Whenever you now want to use this pipeline for new DeepLabCut projects, you just need to repeat steps 4-10!
+
+
+### General Tip
+
+Your home directory might get a bit cluttered if you do not delete the .out/.err files after the jobs are done. Each video that you analyze will generate a pair of these, so they add up quickly. 
+To delete the files, run:
+
+```rm dlc_jobid*```
+
+This command will remove all files that begin with the jobid.
 
