@@ -83,7 +83,7 @@ For these steps, you can simply use the Deeplabcut GUI.
 
 Copy the entire project folder into the workspace using the command:
 
-```scp -r /path/to/local/folder [Username]@gpu.marvin.hpc.uni-bonn.de:/path/to/workspace(which you can find by running ws_list when ssh'd to Marvin)```
+```scp -r /path/to/local/folder [Username]@gpu.marvin.hpc.uni-bonn.de:/path/to/workspace``` (which you can find by running ws_list when ssh'd to Marvin)
 
 ### STEP 7: Adjust the paths in run_dlc_array.sh
 
