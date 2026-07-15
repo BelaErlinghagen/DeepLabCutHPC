@@ -99,7 +99,7 @@ You can adjust the paths by running (in the home directory):
 
 ```nano run_dlc_array.sh```
 
-## STEP 8: Train your DLC model!
+### STEP 8: Train your DLC model!
 
 Now, in order to train the DLC model, you need to run a SLURM job. The file "run_dlc_array.sh" is meant to be used twice for this. Once for the training, and later for the analysis. 
 For the training, navigate to the home directory on Marvin and run:
